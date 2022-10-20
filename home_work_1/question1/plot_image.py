@@ -34,7 +34,7 @@ def plot_data(result, result_error, name, file_name=None):
     plt.xlabel("$x_1$")
     plt.ylabel("$x_2$")
     if file_name is not None:
-        # plt.show()
+        plt.show()
         fig.savefig(file_name)
         plt.close()
     return fig
@@ -78,6 +78,6 @@ def plot_data_line(result, result_error, name, file_name, calculate_function):
                 #     z[i][j] += 100
 
         plt.contour(x, y, z, 0)
-    # plt.show()
+    plt.show()
     plt.close()
     fig.savefig(file_name)

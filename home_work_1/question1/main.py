@@ -17,14 +17,14 @@ pi.plot_data(Data.plot_data_array[1], None, 'X2', '../X2_散点图数据.png')
 
 if __name__ == '__main__':
     test = [
-        pc.LikelihoodProbability(Data),
-        pc.BayesProbability(Data),
-        pc.EuclidProbability(Data)
+        pc.LikelihoodProbability(Data),  # 似然决策规则 分类器
+        pc.BayesProbability(Data),  # 贝叶斯 分类器
+        pc.EuclidProbability(Data),  # 最小欧几里得距离分类器
     ]
 
     for item in test:
-        item.predict()
-        item.plot_error_and_line()
+        item.predict()  # 执行推理过程
+        item.plot_error_and_line()  # 进行绘制操作（绘制散点图，包含错误预估数据 以及 分类线）
 
     for item in test:
-        item.print_error_rate()
+        item.print_error_rate()  # 打印当前类型预测错误率
