@@ -65,7 +65,7 @@ class ProbabilityCalculate:
     def predict(self):
         final_result = []
         for i in range(len(self.data.real_data_array)):
-            print(f'正在计算数据分布X{i + 1}使用{self.name}规则的预测值')
+            print(f'正在计算数据分布X{i + 1}使用“{self.name}”的预测值')
             X = self.data.real_data_array[i]
             y = self.data.target_value_array[i]
             size = self.data.default_size
@@ -87,12 +87,12 @@ class ProbabilityCalculate:
 
             result_error = np.array(result_error_temp)
             final_result.append((result, result_error))
-            print(f'数据分布X{i + 1}使用{self.name}规则的预测值计算完毕')
+            print(f'数据分布X{i + 1}使用“{self.name}”的预测值计算完毕')
         self.predict_result = final_result
 
     def print_error_rate(self):
         for i in range(len(self.predict_result)):
-            print(f'数据分布X{i + 1}使用{self.name}规则的预测错误率为：'
+            print(f'数据分布X{i + 1}使用“{self.name}”的预测错误率为：'
                   f'{len(self.predict_result[i][1]) / self.data.default_size}')
 
     def plot_error_and_line(self):
@@ -107,7 +107,7 @@ class ProbabilityCalculate:
                                       file_name,
                                       lambda x, k: self.calculate_g_k(x, i, k)  # 这里使用lambda表达式是为了增加接下来的代码复用性
                                       )
-            print(f'“{self.name}”的X{i + 1}数据分布及散点图绘制完毕，图片保存在当前目录下的{file_name}文件中。')
+            print(f'“{self.name}”的X{i + 1}数据分布及散点图绘制完毕，图片保存在当前目录下的 {file_name}。')
 
 
 class LikelihoodProbability(ProbabilityCalculate):
