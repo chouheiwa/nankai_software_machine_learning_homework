@@ -10,10 +10,9 @@ import numpy as np
 def generate_by_p(m_all, p_all, cov, data_size):
     data_list = []
     target_list = []
-    print(cov)
     for i in range(len(m_all)):
         size = math.floor(data_size * p_all[i])
-        data_list.append(np.random.multivariate_normal(m_all[i], cov, data_size))
+        data_list.append(np.random.multivariate_normal(m_all[i], cov, size))
         target_list.append([i + 1] * size)
     return data_list, target_list
 
