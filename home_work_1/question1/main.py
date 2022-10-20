@@ -12,8 +12,8 @@ Data = gd.GenerateData(
     probabilities_array=[[0.333, 0.333, 0.334], [0.6, 0.3, 0.1]]  # 先验概率数组，数组中的每个元素为一个先验概率生成模型
 )
 # 绘制散点图
-pi.plot_data(Data.plot_data_array[0], None, 'X1', 'X1_散点图数据.png')
-pi.plot_data(Data.plot_data_array[1], None, 'X2', 'X2_散点图数据.png')
+pi.plot_data(Data.plot_data_array[0], None, 'X1', '../X1_散点图数据.png')
+pi.plot_data(Data.plot_data_array[1], None, 'X2', '../X2_散点图数据.png')
 
 if __name__ == '__main__':
     test = [
