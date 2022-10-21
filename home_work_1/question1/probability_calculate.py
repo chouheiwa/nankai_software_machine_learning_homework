@@ -9,19 +9,25 @@ from generate_data import GenerateData
 
 def calculate_normal_distribution(x, mean, cov):
     """
-    计算正态分布的概率密度函数
+    计算正态分布的概率密度函数-这里去除了常数项
     :param x: 输入的数据
     :param mean: 均值
     :param cov: 协方差
     :return: 正态分布概率密度函数数值
     """
-    cov_det = np.linalg.det(cov)
     cov_inv = np.linalg.inv(cov)
     x_mean = x - mean
     temp = np.matmul(x_mean, cov_inv)
     temp = np.matmul(temp, x_mean.T)
-    return 1 / (np.power(2 * np.pi, len(x) / 2) * np.power(cov_det, 1 / 2)) * np.exp(
-        -1 / 2 * temp)
+    return np.exp(- 0.5 * temp)
+
+
+def calculate_normal_distribution_with_x_y(x, y, mean, cov):
+    cov_inv = np.linalg.inv(cov)
+    x_mean = x - mean[0]
+    y_mean = y - mean[1]
+    temp = np.power(x_mean, 2) * cov_inv[0, 0] + np.power(y_mean, 2) * cov_inv[1, 1]
+    return np.exp(-0.5 * temp)
 
 
 class ProbabilityCalculate:
@@ -31,10 +37,22 @@ class ProbabilityCalculate:
     name = 'Default'  # 记录当前预测函数类的中文名称，用于在绘图时显示
     en_name = 'Default'  # 文件名称中的英文名称
     predict_result = None
-    check_max = True
+    check_max = True  # 用于判别规则中进行g_k是否为最大值
 
     def __init__(self, data: GenerateData):
         self.data = data
+
+    def calculate_g_k_with(self, x1, x2, i, j):
+        """
+        用于供numpy加速计算时使用，相当于限制了二维数组，减少画图时的计算量
+        :param x1: x1的值
+        :param x2: x2的值
+        :param i: 第i个数据分布Xi
+        :param j: 第j个数据分布Xj
+        :return: g_j(x)
+        """
+        assert '需要被子类函数实现'
+        pass
 
     def calculate_g_k(self, x, i, j) -> float:
         """
@@ -65,6 +83,9 @@ class ProbabilityCalculate:
         return result_index + 1
 
     def predict(self):
+        """
+        对数据集进行预测
+        """
         final_result = []
         for i in range(len(self.data.real_data_array)):
             print(f'正在计算数据分布X{i + 1}使用“{self.name}”的预测值')
@@ -93,6 +114,9 @@ class ProbabilityCalculate:
         self.predict_result = final_result
 
     def print_error_rate(self):
+        """
+        打印对应数据集的错误率
+        """
         for i in range(len(self.predict_result)):
             print(f'数据分布X{i + 1}使用“{self.name}”的预测错误率为：'
                   f'{len(self.predict_result[i][1]) / self.data.default_size}')
@@ -107,7 +131,8 @@ class ProbabilityCalculate:
             plot_image.plot_data_line(self.predict_result[i][0], self.predict_result[i][1],
                                       f'X{i + 1} {self.name} 预测结果',
                                       file_name,
-                                      lambda x, k: self.calculate_g_k(x, i, k),  # 这里使用lambda表达式是为了增加接下来的代码复用性
+                                      lambda x, y, k: self.calculate_g_k_with(x, y, i, k),
+                                      # 这里使用lambda表达式是为了增加接下来的代码复用性
                                       self.check_max
                                       )
             print(f'“{self.name}”的X{i + 1}数据分布及散点图绘制完毕，图片保存在当前目录下的 {file_name}。')
@@ -120,9 +145,20 @@ class LikelihoodProbability(ProbabilityCalculate):
     name = '似然率决策规则'
     en_name = 'likelihood'
 
-    def calculate_g_k(self, x, i, j) -> float:
-        return calculate_normal_distribution(x, self.data.default_mean[j], self.data.default_cov) * \
+    def calculate_g_k_with(self, x1, x2, i, j):
+        return calculate_normal_distribution_with_x_y(x1,
+                                                      x2,
+                                                      self.data.default_mean[j],
+                                                      self.data.default_cov) * \
                self.data.probabilities_array[i][j]
+
+    def calculate_g_k(self, x, i, j) -> float:
+        cov_inv = np.linalg.inv(self.data.default_cov)
+        x_mean = x - self.data.default_mean[j]
+        temp = np.matmul(x_mean, cov_inv)
+        temp = np.matmul(temp, x_mean.T)
+
+        return np.exp(-0.5 * temp) * self.data.probabilities_array[i][j]
 
 
 class BayesProbability(ProbabilityCalculate):
@@ -137,8 +173,25 @@ class BayesProbability(ProbabilityCalculate):
          [1, 1, 0]]
 
     def calculate_bayes_probability(self, cov, x, m, p):
-        temp = calculate_normal_distribution(x, m, cov)
-        temp *= p * self.data.default_size
+        return calculate_normal_distribution(x, m, cov) * p
+
+    def calculate_bayes_probability_with(self, cov, x1, x2, m, p):
+        return calculate_normal_distribution_with_x_y(x1, x2, m, cov) * p
+
+    def calculate_g_k_with(self, x1, x2, i, j):
+        temp = None
+        m_all = self.data.default_mean
+        p_all = self.data.probabilities_array[i]
+        for k in range(len(m_all)):
+            current = self.C[j][k] * self.calculate_bayes_probability_with(self.data.default_cov,
+                                                                           x1,
+                                                                           x2,
+                                                                           m_all[k],
+                                                                           p_all[k])
+            if temp is None:
+                temp = current
+            else:
+                temp += current
         return temp
 
     def calculate_g_k(self, x, i, j) -> float:
@@ -160,6 +213,11 @@ class EuclidProbability(ProbabilityCalculate):
     name = '最小欧几里得距离分类器'
     en_name = 'Euclid'
 
+    def calculate_g_k_with(self, x1, x2, i, j):
+        x1_mean = x1 - self.data.default_mean[j][0]
+        x2_mean = x2 - self.data.default_mean[j][1]
+        return - (np.power(x1_mean, 2) + np.power(x2_mean, 2))
+
     def calculate_g_k(self, x, i, j) -> float:
         temp = x - self.data.default_mean[j]
-        return - (1 / 2) * np.dot(temp, temp)
+        return - np.dot(temp, temp)

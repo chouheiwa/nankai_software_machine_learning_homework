@@ -14,23 +14,23 @@
 \definecolor{gray}{rgb}{0.5,0.5,0.5}
 \definecolor{mauve}{rgb}{0.58,0,0.82}
 \lstset{frame=tb,
-  language=Python,
-  aboveskip=3mm,
-  belowskip=3mm,
-  showstringspaces=false,
-  columns=flexible,
-  basicstyle={\small\ttfamily},
-  numbers=left,%设置行号位置none不显示行号
-  %numberstyle=\tiny\courier, %设置行号大小
-  numberstyle=\tiny\color{gray},
-  keywordstyle=\color{blue},
-  commentstyle=\color{dkgreen},
-  stringstyle=\color{mauve},
-  breaklines=true,
-  breakatwhitespace=true,
-  escapeinside=``,%逃逸字符(1左面的键)，用于显示中文例如在代码中`中文...`
-  tabsize=4,
-  extendedchars=false %解决代码跨页时，章节标题，页眉等汉字不显示的问题
+    language=Python,
+    aboveskip=3mm,
+    belowskip=3mm,
+    showstringspaces=false,
+    columns=flexible,
+    basicstyle={\small\ttfamily},
+    numbers=left,%设置行号位置none不显示行号
+%numberstyle=\tiny\courier, %设置行号大小
+    numberstyle=\tiny\color{gray},
+    keywordstyle=\color{blue},
+    commentstyle=\color{dkgreen},
+    stringstyle=\color{mauve},
+    breaklines=true,
+    breakatwhitespace=true,
+    escapeinside=``,%逃逸字符(1左面的键)，用于显示中文例如在代码中`中文...`
+    tabsize=4,
+    extendedchars=false %解决代码跨页时，章节标题，页眉等汉字不显示的问题
 }
 
 % Packages
@@ -66,6 +66,94 @@
 
     绘制数据图像功能代码于文件\href{run:plot_image.py}{plot\_image.py}中。
 
-    main.py函数中会调用上述部分代码，生成数据集并绘制对应数据集的散点图图像。示例结果如下图所示。
+    main.py函数中会调用上述部分代码，生成数据集并绘制对应数据集$X_1$、$X_2$的散点图图像。示例结果如下图所示。
+
+    \begin{figure}[htbp]
+        \begin{minipage}[t]{0.45\linewidth}
+            \centering
+            \includegraphics[height=4cm,width=4cm]{../question1/X1_data}
+        \end{minipage}%
+        \begin{minipage}[t]{0.45\linewidth}
+            \centering
+            \includegraphics[height=4cm,width=4cm]{../question1/X2_data}
+        \end{minipage}\label{fig:figure}
+    \end{figure}
+
+    \subsection{第二小问}
+    代码总体解决方案上因为采用了父类和子类的多态设计，所以在main.py中只需要调用类的方法即可，不需要关心具体的实现细节。因此，这里只需要介绍类的设计思路。
+
+    类文件为\href{run:probability_calculate.py}{probability\_calculate.py}。其中，父类(基类)为 ProbabilityCalculate 其主要负责实现通用判别函数，以及其他相关绘制分类线的方法，父类的存在使得子类只需要继承父类的功能，并实现对应计算$g_k(x)$函数的方法即可作为对应的分类器，而无需关心其他细节。加强了代码的复用性。
+
+    因此这里对接下来的三种分类器均计算出$g_k(x)$的表达式便可以完成对应的分类器的设计。
+
+    \subsubsection{似然率决策规则}\label{subsubsec:likelihood}
+    似然率决策规则的基本思想是，对于给定的样本，我们可以通过计算其属于各个类别的概率，然后选择概率最大的类别作为其所属类别。因此，对于给定的样本$x$，其属于类别$m_k$的概率为
+    \begin{equation}
+        P(m_k|x) = \frac{P(x|m_k)P(m_k)}{P(x)} \label{eq:a}
+    \end{equation}
+
+    其中，$P(x|m_k)$为似然率，$P(m_k)$为先验概率，$P(x)$为归一化因子。由于$P(x)$对于所有类别$k$都是相同的，因此我们可以忽略该项，即
+    \begin{equation}
+        P(m_k|x) \propto P(x|m_k)P(m_k) \label{eq:b}
+    \end{equation}
+
+    即可以令
+    \begin{equation}
+        g_k(x) = P(m_k|x) \label{eq:c}
+    \end{equation}
+    则我们可以通过计算$g_k(x)$的值，然后选择最大的$g_k(x)$对应的类别$m_k$作为样本$x$的预测类别。
+
+    又因为题目中给定数据集是从属于三个正态分布的$m_1$、$m_2$、$m_3$，所以其属于类别$m_k$的似然率$P(x|m_k)$可以写成:
+    \begin{equation}
+        P(x|m_k) = \frac{1}{(2\pi)^{\frac{d}{2}}|\Sigma_k|^{\frac{1}{2}}}\exp\left(-\frac{1}{2}(x-m_k)^T\Sigma_k^{-1}(x-m_k)\right) \label{eq:e}
+    \end{equation}
+    将~\eqref {eq:e}代入~\eqref {eq:b}，则有
+    \begin{equation}
+        P(m_k|x) \propto \frac{1}{(2\pi)^{\frac{d}{2}}|\Sigma_k|^{\frac{1}{2}}}\exp\left(-\frac{1}{2}(x-m_k)^T\Sigma_k^{-1}(x-m_k)\right)P(m_k) \label{eq:f}
+    \end{equation}
+    根据题目可知，$m_1$、$m_2$、$m_3$所属正态分布的协方差矩阵均相同，即$|\Sigma_k|$为常数，此时我们可以继续忽略常数项，便可由~\eqref {eq:f}得到
+    \begin{equation}
+        P(m_k|x) \propto \exp\left(-\frac{1}{2}(x-m_k)^T\Sigma_k^{-1}(x-m_k)\right)P(m_k) \label{eq:g}
+    \end{equation}
+    此时，我们可以将~\eqref {eq:g}代入~\eqref {eq:c}，则有
+    \begin{equation}
+        g_k(x) = \exp\left(-\frac{1}{2}(x-m_k)^T\Sigma_k^{-1}(x-m_k)\right)P(m_k) \label{eq:h}
+    \end{equation}
+    似然率决策规则的分类器设计实验完毕。其代码所属类名为 LikelihoodProbability。
+
+    \subsubsection{贝叶斯风险决策规则}
+    贝叶斯风险决策规则的基本思想是，对于给定的样本，我们可以通过计算其属于各个类别的风险，然后选择风险最小的类别作为其所属类别。因此，对于给定的样本$x$，其属于类别$m_i$的风险为
+    \begin{equation}
+        \Re(\alpha_i|x) = = \sum_{j = 1}^{C} C_{ij} P(m_j|x) \label{eq:i}
+    \end{equation}
+
+    其后验概率 $P(m_j|x)$ 表达式为
+
+    \begin{equation}
+        P(m_j|x) = \frac{1}{(2\pi)^{\frac{d}{2}} \sqrt{|\Sigma_j|}}e^{-\frac{1}{2}(x-m_j)^T\Sigma_j^{-1}(x-m_j)}\frac{P(m_j)}{p(x)} \label{eq:j}
+    \end{equation}
+
+    与似然决策规则相同，其中$\frac{1}{(2\pi)^{\frac{d}{2}} \sqrt{|\Sigma_j|}}$ 与 $\frac{1}{p(x)}$ 为常数，因此可以忽略不计。则~\eqref {eq:j}可写成：
+
+    \begin{equation}
+        P(m_j|x) \propto \exp\left( -\frac{1}{2}(x-m_j)^T\Sigma_k^{-1}(x-m_j) \right) P(m_j) \label{eq:k}
+    \end{equation}
+
+    贝叶斯风险决策的$g_i(x)$等于~\eqref {eq:i} 同时将~\eqref {eq:k} 代入~\eqref {eq:i}，则有：
+    \begin{equation}
+        g_i(x) = \sum_{j = 1}^{C} C_{ij} \exp\left( -\frac{1}{2}(x-m_j)^T\Sigma_j^{-1}(x-m_j) \right) P(m_j) \label{eq:l}
+    \end{equation}
+
+    与似然率决策规则~\ref{subsubsec:likelihood}不同，贝叶斯风险决策规则需要选取风险最小即$g_i(x)$最小的类别作为其所属类别。
+
+    贝叶斯风险决策规则的分类器设计实验完毕。其代码所属类名为 BayesProbability。
+
+    \subsubsection{最小欧几里得距离分类器}
+    其$g_i(x) = \frac{1}{2}(x-m_i)^T(x-m_i)$，去除常数项后为$g_i(x) =  -(x-m_i)^T(x-m_i)$
+
+    最小欧几里得距离分类器的分类器设计实验完毕。其代码所属类名为 EuclidProbability。
+
+    \subsection{第三小问 实验结果分析和分类决策界面与错误}
+    实验代码如\href{run:main.py}{main.py}中的主函数部分所示。实验结果如下图所示。
 
 \end{document}
