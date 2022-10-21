@@ -3,7 +3,7 @@ import numpy as np
 from matplotlib.font_manager import FontProperties
 
 colors = ['blue', 'orange', 'green', 'red']
-font = {"family": "KaiTi", "size": 14}  # 设置字体
+font = FontProperties(fname=r"SimHei.ttf", size=14)
 
 
 # 添加绘图功能
@@ -15,7 +15,7 @@ def plot_data(result, result_error, name, file_name=None):
     :param name: 数据图像标题名称
     :param file_name: 保存图片文件
     """
-    fig = plt.figure(figsize=(8, 8))
+    fig = plt.figure()
     plt.axis('equal')
     plot_array = []
     plot_title = []
@@ -30,7 +30,7 @@ def plot_data(result, result_error, name, file_name=None):
         plot_array.append(plot_item)
         plot_title.append('error')
     plt.legend(plot_array, plot_title)
-    plt.title(f"{name} 数据图", fontdict=font)
+    plt.title(f"{name} 数据图", fontproperties=font)
     plt.xlabel("$x_1$")
     plt.ylabel("$x_2$")
     if file_name is not None:
@@ -40,7 +40,7 @@ def plot_data(result, result_error, name, file_name=None):
     return fig
 
 
-def plot_data_line(result, result_error, name, file_name, calculate_function):
+def plot_data_line(result, result_error, name, file_name, calculate_function, check_max=True):
     """
     将给定的数据集绘制出散点图，并且绘制出分类线
     :param result: 绘制分类数据集
@@ -48,13 +48,14 @@ def plot_data_line(result, result_error, name, file_name, calculate_function):
     :param name: 数据图像标题名称
     :param file_name: 保存图片文件
     :param calculate_function: 计算函数，入参为x的向量，与当前均值索引，返回值为函数计算数值
+    :param check_max: 检测最大值还是最小值
     """
     fig = plot_data(result, result_error, name, None)
 
     index_array = [[0, 1, 2], [0, 2, 1], [1, 2, 0]]
     result = []
-    x = np.arange(-4, 12, 0.1)
-    y = np.arange(-6, 10, 0.1)
+    x = np.arange(-4, 12, 0.01)
+    y = np.arange(-6, 10, 0.01)
     x, y = np.meshgrid(x, y)
     for i in range(x.shape[0]):
         result.append([])
@@ -71,12 +72,19 @@ def plot_data_line(result, result_error, name, file_name, calculate_function):
                 temp_1 = result[i][j][item[0]]
                 temp_2 = result[i][j][item[1]]
                 temp_3 = result[i][j][item[2]]
-                max_data = max(temp_1, temp_2, temp_3)
 
                 z[i][j] = temp_1 - temp_2
+
+                if check_max:
+                    if temp_3 > temp_1 and temp_3 > temp_2 and z[i][j] < 10e-5:
+                        z[i][j] += 100
+                else:
+                    if temp_3 < temp_1 and temp_3 < temp_2 and z[i][j] < 10e-5:
+                        z[i][j] += 100
+
                 # if max_data == temp_3:
                 #     z[i][j] += 100
-
+        # 此函数实际作用为绘制等高线，这里只需要让等高线的值为0，即可绘制出分类线
         plt.contour(x, y, z, 0)
     plt.show()
     plt.close()

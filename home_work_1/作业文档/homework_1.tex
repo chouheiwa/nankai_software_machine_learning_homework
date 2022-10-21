@@ -1,0 +1,71 @@
+%! Author = chouheiwa
+%! Date = 2022/10/21
+
+% Preamble
+\documentclass[UTF8]{article} %article 文档
+\usepackage{ctex}  %使用宏包(为了能够显示汉字)
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{geometry}
+\geometry{a4paper,scale=0.8}
+\usepackage{listings}
+\usepackage{color}
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+\lstset{frame=tb,
+  language=Python,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=left,%设置行号位置none不显示行号
+  %numberstyle=\tiny\courier, %设置行号大小
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  escapeinside=``,%逃逸字符(1左面的键)，用于显示中文例如在代码中`中文...`
+  tabsize=4,
+  extendedchars=false %解决代码跨页时，章节标题，页眉等汉字不显示的问题
+}
+
+% Packages
+\usepackage{amsmath}
+
+% Document
+\title{机器学习课程作业1}
+\author{chouheiwa}
+\date{2022/10/21}
+\linespread{1.5}
+\begin{document}
+    \maketitle
+
+
+    \section{问题一}
+    这里无法避免使用到矩阵的算法，以及绘图的算法，所以代码中会额外需要使用到numpy（用以进行数学运算）和matplotlib（用以生成和绘制相关散点图及分界线图）这两个库。
+
+    \subsection{第一小问}
+    这里已知要生成N = 1000个二维样本的数据集$X_1$和$X_2$。又知晓样本来自于三个不同的正态分布，其分布的均值矢量分别为
+    \[
+        m_1 = [1, 1]^T\\m_2 = [4, 4]^T\\m_3 = [8, 1]^T
+    \]
+    协方差为
+    \[
+        \Sigma_1 = \Sigma_2 = \Sigma_3 = \begin{bmatrix}
+                                             2 & 0 \\ 0 & 2
+        \end{bmatrix}
+    \]
+
+    因此，我们可以先生成三个正态分布的随机数，然后再将其乘以协方差矩阵，最后再加上均值矢量，即可得到三个正态分布的样本。这里我们使用 numpy 的 random.multivariate\_normal 函数来生成对应数据集。
+
+    生成数据集功能使用了名为GenerateData作为根据给定参数自动生成相关数据集的功能的类，其代码于文件\href{run:generate_data.py}{generate\_data.py}中。
+
+    绘制数据图像功能代码于文件\href{run:plot_image.py}{plot\_image.py}中。
+
+    main.py函数中会调用上述部分代码，生成数据集并绘制对应数据集的散点图图像。示例结果如下图所示。
+
+\end{document}

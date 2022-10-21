@@ -28,8 +28,10 @@ class ProbabilityCalculate:
     """
     进行决策率计算的父类函数，其具体实现由各个子类去完成
     """
-    name = 'Default'
+    name = 'Default'  # 记录当前预测函数类的中文名称，用于在绘图时显示
+    en_name = 'Default'  # 文件名称中的英文名称
     predict_result = None
+    check_max = True
 
     def __init__(self, data: GenerateData):
         self.data = data
@@ -57,7 +59,7 @@ class ProbabilityCalculate:
         m_all = self.data.default_mean
         for k in range(len(m_all)):
             temp = self.calculate_g_k(self.data.real_data_array[i][j], i, k)
-            if result is None or result < temp:
+            if result is None or (result < temp if self.check_max else result > temp):
                 result_index = k
                 result = temp
         return result_index + 1
@@ -101,11 +103,12 @@ class ProbabilityCalculate:
         """
         for i in range(len(self.predict_result)):
             print(f'开始绘制“{self.name}”的X{i + 1}数据分布及散点图')
-            file_name = f'X{i + 1}_散点图数据_{self.name}_预测结果.png'
+            file_name = f'X{i + 1}_data_{self.en_name}_predict_result.png'
             plot_image.plot_data_line(self.predict_result[i][0], self.predict_result[i][1],
                                       f'X{i + 1} {self.name} 预测结果',
                                       file_name,
-                                      lambda x, k: self.calculate_g_k(x, i, k)  # 这里使用lambda表达式是为了增加接下来的代码复用性
+                                      lambda x, k: self.calculate_g_k(x, i, k),  # 这里使用lambda表达式是为了增加接下来的代码复用性
+                                      self.check_max
                                       )
             print(f'“{self.name}”的X{i + 1}数据分布及散点图绘制完毕，图片保存在当前目录下的 {file_name}。')
 
@@ -115,6 +118,7 @@ class LikelihoodProbability(ProbabilityCalculate):
     似然概率的计算类
     """
     name = '似然率决策规则'
+    en_name = 'likelihood'
 
     def calculate_g_k(self, x, i, j) -> float:
         return calculate_normal_distribution(x, self.data.default_mean[j], self.data.default_cov) * \
@@ -126,6 +130,8 @@ class BayesProbability(ProbabilityCalculate):
     贝叶斯概率的计算类
     """
     name = '贝叶斯风险决策规则'
+    en_name = 'bayes'
+    check_max = False
     C = [[0, 2, 3],
          [1, 0, 2.5],
          [1, 1, 0]]
@@ -142,8 +148,8 @@ class BayesProbability(ProbabilityCalculate):
         for k in range(len(m_all)):
             temp += self.C[j][k] * self.calculate_bayes_probability(self.data.default_cov,
                                                                     x,
-                                                                    m_all[j],
-                                                                    p_all[j])
+                                                                    m_all[k],
+                                                                    p_all[k])
         return temp
 
 
@@ -152,6 +158,7 @@ class EuclidProbability(ProbabilityCalculate):
     欧式距离的计算类
     """
     name = '最小欧几里得距离分类器'
+    en_name = 'Euclid'
 
     def calculate_g_k(self, x, i, j) -> float:
         temp = x - self.data.default_mean[j]
