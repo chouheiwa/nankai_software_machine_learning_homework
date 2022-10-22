@@ -35,6 +35,8 @@
 
 % Packages
 \usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
 
 % Document
 \title{机器学习课程作业1}
@@ -44,6 +46,7 @@
 \begin{document}
     \maketitle
     \tableofcontents
+
 
     \section{问题一}
     这里无法避免使用到矩阵的算法，以及绘图的算法，所以代码中会额外需要使用到numpy（用以进行数学运算）和matplotlib（用以生成和绘制相关散点图及分界线图）这两个库。
@@ -181,6 +184,7 @@
         \includegraphics[width=\linewidth]{../question1/X2_data_likelihood_predict_result}
         \label{fig:likelihood2} %此处的label相当于一个图片的专属标志，目的是方便上下文的引用
     \end{minipage}
+
     \paragraph{错误率}
 
     可以看到，X1中的预测数据错误量为68个，错误率为6.8\%,X2中的预测数据错误量为65个，错误率为6.5\%。
@@ -206,6 +210,7 @@
         \includegraphics[width=\linewidth]{../question1/X2_data_bayes_predict_result}
         \label{fig:bayes2} %此处的label相当于一个图片的专属标志，目的是方便上下文的引用
     \end{minipage}
+
     \paragraph{错误率}  可以看到，X1中的预测数据错误量为75个，错误率为7.5\%,X2中的预测数据错误量为77个，错误率为7.7\%。
 
     实验结论:
@@ -228,6 +233,7 @@
         \includegraphics[width=\linewidth]{../question1/X2_data_Euclid_predict_result}
         \label{fig:Euclid2} %此处的label相当于一个图片的专属标志，目的是方便上下文的引用
     \end{minipage}
+
     \paragraph{错误率}  可以看到，X1中的预测数据错误量为68个，错误率为6.8\%,X2中的预测数据错误量为78个，错误率为7.8\%。
 
     实验结论:
@@ -237,6 +243,70 @@
         \item 对比X1,X2数据集，最小欧几里得距离分类器的错误率明显会在先验概率不相等的情况下高于相等的情况，即其最佳条件适用于先验概率相等的情况
     \end{enumerate}
 
-    \section{问题二}
 
+    \section{问题二}
+    \begin{proof}
+
+        由题意得:
+
+        $\epsilon_1$ 为第一类问题的错误率(即本属于第一类问题但是误判成第二类问题)， $\epsilon_2$ 为第二类问题的错误率(即本属于第二类问题但是误判成第一类问题)。
+
+        这里设第一类问题标签为$\omega_1$，第二类问题标签为$\omega_2$。
+
+        则有:
+        \begin{equation}
+            \epsilon_1 = \int_{\omega_2} P(x|\omega_1)dx \label{eq:2.1}
+        \end{equation}
+        \begin{equation}
+            \epsilon_2 = \int_{\omega_1} P(x|\omega_2)dx \label{eq:2.2}
+        \end{equation}
+
+        令$\epsilon_1 = \epsilon = \text{常数}$，则问题可以转化为求解使$\epsilon_2$最小的判决域。
+
+        使用拉格朗日乘子法，得到:
+        \begin{equation}
+            y = \epsilon_2 + \theta(\epsilon_1 - \epsilon) \label{eq:2.3}
+        \end{equation}
+
+        将~\eqref{eq:2.1}和~\eqref{eq:2.2}代入~\eqref{eq:2.3}，得到:
+        \begin{equation}
+            y = \epsilon_2 + \theta(\int_{\omega_2} P(x|\omega_1)dx - \epsilon) \label{eq:2.4}
+        \end{equation}
+
+        又错误率$\epsilon_2 = 1 - P_2(correct) = 1 - \int_{\omega_2} P(x|\omega_2)dx$，代入~\eqref{eq:2.4}，可得
+        \begin{equation}
+            y = 1 - \int_{\omega_2} P(x|\omega_2)dx + \theta(\int_{\omega_2} P(x|\omega_1)dx - \epsilon) \newline
+            = (1 - \theta \epsilon) - \int_{\omega_2} \left[ P(x|\omega_2) - \theta P(x|\omega_1) \right]\label{eq:2.5}
+        \end{equation}
+
+        一般来说，我们无法用解析方法直接求出符合条件的$\omega_2$的判决域$S_2$，但可以注意到$\theta$在式子中其实是确定的，且$P(x|\omega_2)$、$P(x|\omega_1)$在给定空间中也是确定的，此时只需选择的满足条件$P(x|\omega_2) - \theta P(x|\omega_1) > 0$的全体$x$作为$\omega_2^{*}$即可保证此时所求的y值比其他方法取得的y值要小。
+
+        因为这种取法下，$\omega_2^{*}$是使被积函数取正数时最大的域，即此时应该取$\omega_2$，。
+
+        于是在两类分类问题中，可以约束某个类别的错误率不变，即$\epsilon_1 = \epsilon$，此时最小化另一类别错误率得到的似然率测试规则为:
+        \begin{align}
+            \text{decide } x \in \omega_2 \text{ if } & P(x|\omega_2) - \theta P(x|\omega_1) > 0 \\
+            & \frac{P(x|\omega_2)}{P(x|\omega_1)} > \theta
+        \end{align}
+
+        同理可得:
+        \begin{align}
+            \text{decide } x \in \omega_1 \text{ if } & P(x|\omega_2) - \theta P(x|\omega_1) < 0 \\
+            & \frac{P(x|\omega_1)}{P(x|\omega_2)} > \theta \label{al:2.6}
+        \end{align}
+
+        又$P(x|\omega_2) = \frac{P(\omega_2|x) P(x)}{P(\omega_2)}$，$P(x|\omega_1) = \frac{P(\omega_1|x) P(x)}{P(\omega_1)}$，代入~\eqref{al:2.6}有:
+        \begin{align}
+            \text{decide } x \in \omega_1 \text{ if } & \frac{\frac{P(\omega_1|x) P(x)}{P(\omega_1)}}{\frac{P(\omega_2|x) P(x)}{P(\omega_2)}} > \theta \\
+            \frac{P(\omega_1|x)}{P(\omega_2|x)} > \theta \frac{P(\omega_1)}{P(\omega_2)} \label{al:2.7}
+        \end{align}
+
+        又$P(\omega_1)$、$P(\omega_2)$、$\theta$均为常数，因此可将其简写为$\theta$，即:
+        \[
+        \text{decide } x \in \omega_1 \text{ if } \frac{P(\omega_1|x)}{P(\omega_2|x)} > \theta
+        \]
+
+        证毕。
+
+    \end{proof}
 \end{document}
