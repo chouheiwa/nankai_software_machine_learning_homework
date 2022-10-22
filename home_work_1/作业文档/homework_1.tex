@@ -43,7 +43,7 @@
 \linespread{1.5}
 \begin{document}
     \maketitle
-
+    \tableofcontents
 
     \section{问题一}
     这里无法避免使用到矩阵的算法，以及绘图的算法，所以代码中会额外需要使用到numpy（用以进行数学运算）和matplotlib（用以生成和绘制相关散点图及分界线图）这两个库。
@@ -68,18 +68,17 @@
 
     main.py函数中会调用上述部分代码，生成数据集并绘制对应数据集$X_1$、$X_2$的散点图图像。示例结果如下图所示。
 
-    \begin{figure}[htbp]
-        \begin{minipage}[t]{0.45\linewidth}
-            \centering
-            \includegraphics[height=4cm,width=4cm]{../question1/X1_data}
-        \end{minipage}%
-        \begin{minipage}[t]{0.45\linewidth}
-            \centering
-            \includegraphics[height=4cm,width=4cm]{../question1/X2_data}
-        \end{minipage}\label{fig:figure}
-    \end{figure}
 
-    \subsection{第二小问}
+    \begin{minipage}[t]{0.5\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{../question1/X1_data}
+    \end{minipage}%
+    \begin{minipage}[t]{0.5\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{../question1/X2_data}
+    \end{minipage}
+
+    \subsection{第二小问} \label{sec:question1_2}
     代码总体解决方案上因为采用了父类和子类的多态设计，所以在main.py中只需要调用类的方法即可，不需要关心具体的实现细节。因此，这里只需要介绍类的设计思路。
 
     类文件为\href{run:probability_calculate.py}{probability\_calculate.py}。其中，父类(基类)为 ProbabilityCalculate 其主要负责实现通用判别函数，以及其他相关绘制分类线的方法，父类的存在使得子类只需要继承父类的功能，并实现对应计算$g_k(x)$函数的方法即可作为对应的分类器，而无需关心其他细节。加强了代码的复用性。
@@ -154,6 +153,90 @@
     最小欧几里得距离分类器的分类器设计实验完毕。其代码所属类名为 EuclidProbability。
 
     \subsection{第三小问 实验结果分析和分类决策界面与错误}
-    实验代码如\href{run:main.py}{main.py}中的主函数部分所示。实验结果如下图所示。
+
+    分类线绘制方法，可由~\ref{sec:question1_2}中的判决规则得到，我们在最佳选择时，往往采用的是最大(最小)$g_i(x)$的类别作为其所属类别。且题目有且仅有3个类别，因此我们即可得到分类线的定义
+    \begin{equation}
+        g_i(x) = g_j(x) \text{ 且 } g_i(x) > g_k(x) \forall k \neq i,j \label{eq:m}
+    \end{equation}
+    \begin{equation}
+        g_i(x) = g_j(x) \text{ 且 } g_i(x) < g_k(x) \forall k \neq i,j \label{eq:n}
+    \end{equation}
+    其中\eqref{eq:m} 为最大$g_i(x)$的类别作为其所属类别，\eqref{eq:n} 为最小$g_i(x)$的类别作为其所属类别。
+
+    在计算机绘图中，我们很难去精确计算$g_i(x) - g_j(x) = 0$，这个方程中的$x_1$,$x_2$的具体映射关系，所以我们会采取令$z(x) = g_i(x) - g_j(x)$。此时我们如果将向量$x$的所属区域细分成网格，并去计算每个网格点的$z(x)$，接下来我们只需要绘制等高线$z(x) = 0$，即可完成分类线。
+
+    实验代码如\href{run:main.py}{main.py}中的主函数部分所示。
+
+    \subsubsection{似然率决策规则}
+
+    分类决策界面如下图:
+
+    \begin{minipage}[t]{0.5\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{../question1/X1_data_likelihood_predict_result}
+        \label{fig:likelihood1} %此处的label相当于一个图片的专属标志，目的是方便上下文的引用
+    \end{minipage}%
+    \begin{minipage}[t]{0.5\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{../question1/X2_data_likelihood_predict_result}
+        \label{fig:likelihood2} %此处的label相当于一个图片的专属标志，目的是方便上下文的引用
+    \end{minipage}
+    \paragraph{错误率}
+
+    可以看到，X1中的预测数据错误量为68个，错误率为6.8\%,X2中的预测数据错误量为65个，错误率为6.5\%。
+
+    实验结论:
+    \begin{enumerate}
+        \item 似然率决策规则的分类界面为线性
+        \item 似然率决策规则对于先验概率较为敏感，其分界线会随着数据集先验概率变化而变化
+        \item 在已知数据概率分布函数的情况下，似然率决策规则的分类效果较好
+    \end{enumerate}
+
+    \subsubsection{贝叶斯风险决策规则}
+
+    分类决策界面如下图:
+
+    \begin{minipage}[t]{0.5\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{../question1/X1_data_bayes_predict_result}
+        \label{fig:bayes1} %此处的label相当于一个图片的专属标志，目的是方便上下文的引用
+    \end{minipage}%
+    \begin{minipage}[t]{0.5\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{../question1/X2_data_bayes_predict_result}
+        \label{fig:bayes2} %此处的label相当于一个图片的专属标志，目的是方便上下文的引用
+    \end{minipage}
+    \paragraph{错误率}  可以看到，X1中的预测数据错误量为75个，错误率为7.5\%,X2中的预测数据错误量为77个，错误率为7.7\%。
+
+    实验结论:
+    \begin{enumerate}
+        \item 贝叶斯风险决策规则的分类界面近似为线性 (可能由实验误差或给定$C_{ij}$不同引起)
+        \item 对比于似然率决策规则，贝叶斯风险决策规则错误率可能会高
+    \end{enumerate}
+
+    \subsubsection{最小欧几里得距离分类器}
+
+    分类决策界面如下图:
+
+    \begin{minipage}[t]{0.5\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{../question1/X1_data_Euclid_predict_result}
+        \label{fig:Euclid1} %此处的label相当于一个图片的专属标志，目的是方便上下文的引用
+    \end{minipage}%
+    \begin{minipage}[t]{0.5\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{../question1/X2_data_Euclid_predict_result}
+        \label{fig:Euclid2} %此处的label相当于一个图片的专属标志，目的是方便上下文的引用
+    \end{minipage}
+    \paragraph{错误率}  可以看到，X1中的预测数据错误量为68个，错误率为6.8\%,X2中的预测数据错误量为78个，错误率为7.8\%。
+
+    实验结论:
+    \begin{enumerate}
+        \item 最小欧几里得距离分类器为线性
+        \item 最小欧几里得距离分类器对先验概率无反应，其分类界面不会随着数据集先验概率变化而变化
+        \item 对比X1,X2数据集，最小欧几里得距离分类器的错误率明显会在先验概率不相等的情况下高于相等的情况，即其最佳条件适用于先验概率相等的情况
+    \end{enumerate}
+
+    \section{问题二}
 
 \end{document}
