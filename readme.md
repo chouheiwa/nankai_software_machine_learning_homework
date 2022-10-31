@@ -23,3 +23,5 @@
 - LaTeX (可选) 用于通过tex文件生成 pdf 文件
     
     如何运行使用LaTeX并编译tex文件，可以使用百度搜索[这里](https://www.baidu.com/s?wd=LaTeX%20tex%20%E6%96%87%E4%BB%B6%E7%BC%96%E8%AF%91&rsv_spt=1&rsv_iqid=0xca807f20002b2718&issp=1&f=8&rsv_bp=1&rsv_idx=2&ie=utf-8&tn=baiduhome_pg&rsv_dl=tb&rsv_enter=1&rsv_sug2=0&rsv_btype=i&inputT=10575&rsv_sug4=10575)
+  - 也可以使用在线的LaTeX编辑器，如[这里](https://www.overleaf.com/)
+  - 编译tex文件前，需要先运行对应作业前的main.py文件，以生成对应的图片文件，否则编译会出错。
