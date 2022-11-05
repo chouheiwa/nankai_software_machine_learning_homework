@@ -3,7 +3,7 @@
 """
 import numpy as np
 
-from home_work_2.question2.image_plot import ImagePlot
+from image_plot import ImagePlot
 
 
 class LikelihoodClassifier(ImagePlot):

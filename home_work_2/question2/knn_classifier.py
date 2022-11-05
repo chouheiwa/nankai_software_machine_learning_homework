@@ -2,7 +2,7 @@ from typing import overload
 
 import numpy as np
 
-from home_work_2.question2.image_plot import ImagePlot
+from image_plot import ImagePlot
 
 
 def normalize_M(X):
