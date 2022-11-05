@@ -2,6 +2,7 @@ import os
 
 import numpy as np
 from gmm_em import Record
+from plot_image import get_path
 
 
 class GenerateData:
@@ -21,16 +22,17 @@ class GenerateData:
         初始化函数
         :param load_data: 是否加载本地数据(加载数据主要是方便后续的算法分析)
         """
-        if load_data and os.path.exists(os.path.join('data', 'data.npy')) and os.path.exists(
-                os.path.join('data', 'target.npy')):
-            self.result = np.load(os.path.join('data', 'data.npy'))
-            self.result_target = np.load(os.path.join('data', 'target.npy'))
+        dir_path = get_path('data')
+        if load_data and os.path.exists(os.path.join(dir_path, 'data.npy')) and os.path.exists(
+                os.path.join(dir_path, 'target.npy')):
+            self.result = np.load(os.path.join(dir_path, 'data.npy'))
+            self.result_target = np.load(os.path.join(dir_path, 'target.npy'))
         else:
             self.generate_data_method2()
-            if not os.path.exists('data'):
-                os.makedirs('data')
-            np.save(os.path.join('data', 'data.npy'), self.result)
-            np.save(os.path.join('data', 'target.npy'), self.result_target)
+            if not os.path.exists(dir_path):
+                os.makedirs(dir_path)
+            np.save(os.path.join(dir_path, 'data.npy'), self.result)
+            np.save(os.path.join(dir_path, 'target.npy'), self.result_target)
 
         self.P = np.zeros(len(self.all_mean))
 

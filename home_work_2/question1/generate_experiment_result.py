@@ -1,8 +1,9 @@
 from os import path
+from plot_image import get_path
 
 
 def write_experiment_result(initial_mu, P, mu, cov):
-    with open(path.join('作业文档', 'result.tex'), 'w') as f:
+    with open(path.join(get_path('作业文档'), 'result.tex'), 'w') as f:
         result = r"""\[
     \hat{\mu}_1^{(0)} =  \left[
         \begin{matrix}

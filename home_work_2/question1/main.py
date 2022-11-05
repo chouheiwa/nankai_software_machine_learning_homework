@@ -3,7 +3,7 @@ from os import path
 import numpy as np
 
 from generate_data import GenerateData
-from plot_image import plot_data, plot_record
+from plot_image import plot_data, plot_record, get_path
 from gmm_em import gmm_em
 
 
@@ -51,10 +51,13 @@ def question_1_2():
         print(f'cov_{i + 1}_error    : {np.abs(data.COV[i] - cov[i])}')
 
     plot_record(record, data.get_target_record(), order)
-    if path.exists('generate_experiment_result.py'):  # 将实验结果写入tex文件，用于生成最后pdf报告，因作业时不需要，所以此处增加了判断
+    try:
+        # 这里尝试引入生成实验数据报告的文件，若该文件不存在则不会继续生成
         from generate_experiment_result import write_experiment_result
-
         write_experiment_result(record.initial_mu[order.tolist(), :], P, mu, cov)
+    except ImportError:
+        # 在提交的作业中不会生成对应实验报告文件，此处直接放弃对错误进行处理
+        pass
 
 
 if __name__ == '__main__':
