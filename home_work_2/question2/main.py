@@ -140,6 +140,8 @@ if __name__ == '__main__':
 
     likelihood_classifier.plot(X_test, y_test, get_path('likelihood_classifier.png'))
     # 注意这里绘制knn分类器的决策边界，速度很慢，在上述compute_max_k_accuracy函数中可以看出，对于一组1500数据点的训练集，耗时为约为4.7s。
+    # 上述基准时间可能会因为不同的电脑配置而有所不同，同时下述时间也将会随着基准时间的变化而变化，具体耗时请运行代码后查看控制台时间。
     # 绘制分类边界时，需要对每个点进行预测，此时使用的点阵为 1000 * 1000 = 1000000个点，因此预测耗时为
     # 1000000 / 1500 * 4.7 = 3133s = 52.2min = 0.87h, 此时可以考虑降低绘图边界。或者使用更优算法（如kd树）以优化计算训练集的时间。
+    # 目前来看，使用kd树对当前最近邻算法进行优化，应该会有不错效果。
     knn_classifier.plot(X_test, y_test, get_path('knn_decision_boundary.png'))
