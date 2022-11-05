@@ -1,5 +1,5 @@
 %! Author = chouheiwa
-%! Date = 2022/11/02
+%! Date = 2022/11/05
 
 % Preamble
 \documentclass[UTF8]{article} %article 文档
@@ -42,7 +42,7 @@
 % Document
 \title{机器学习课程作业-问题2}
 \author{chouheiwa}
-\date{2022/11/02}
+\date{2022/11/05}
 \linespread{1.5}
 \begin{document}
     \maketitle
@@ -57,7 +57,11 @@
 
     使用scipy.io.loadmat函数加载mat文件，然后将数据集，并将数据集展开做标注，随后尝试使用$k \in 1 , 2,\dots, 100$，并将测试集数据代入knn算法中，最后绘制出$k$与准确率的关系图，如下:
 
-    \includegraphics[width=0.8\textwidth]{../knn_accuracy}
+    \begin{figure}[htbp]
+        \centering
+        \includegraphics[width=0.8\textwidth]{../knn_accuracy}
+        \caption{最近邻算法在预测集的准确率随k值变化图}
+    \end{figure}
 
     可以发现当$k > 40$后，随着k的增长，其准确率下降的趋势越来越明显，因此可以判定这里无需增加$k$的取值范围了，当前准确率即可找到最优$k_{opt}$
 

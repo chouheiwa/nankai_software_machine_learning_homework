@@ -1,11 +1,12 @@
 from abc import abstractmethod, ABCMeta
-from os import path
 
 import numpy as np
 from matplotlib import pyplot as plt
 
 
 class ImagePlot(metaclass=ABCMeta):
+    """此类主要是为了使子类分类器可以直接继承获得绘图功能，而无需单独实现"""
+
     train_data = None
     train_label = None
 
