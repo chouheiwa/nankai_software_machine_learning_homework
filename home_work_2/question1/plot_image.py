@@ -10,6 +10,15 @@ colors = ['blue', 'orange', 'green', 'red']
 font = FontProperties(fname=r"SimHei.ttf", size=14)
 
 
+def get_path(file):
+    """
+    获取文件路径 用于兼容不同目录下执行此python文件可能导致路径读取错误的问题
+    :param file:
+    :return:
+    """
+    return path.join(path.dirname(path.abspath(__file__)), file)
+
+
 # 添加绘图功能
 def plot_data(result, result_class):
     """
@@ -41,10 +50,11 @@ def plot_data(result, result_class):
     plt.title(f"数据散点图", fontproperties=font)
     plt.xlabel("$x_1$")
     plt.ylabel("$x_2$")
-    if not path.exists('images'):
-        os.makedirs('images')
+    dir_path = get_path('images')
+    if not path.exists(dir_path):
+        os.makedirs(dir_path)
     # plt.show()
-    fig.savefig(path.join('images', 'data.png'))
+    fig.savefig(path.join(dir_path, 'data.png'))
     plt.close()
 
     return fig
@@ -65,11 +75,13 @@ def plot_record(record: AllRecord, real: Record, order):
         for j in range(2):
             ax = plt.subplot(len(real.pi), 2, i * 2 + j + 1, label=f'Record {i + 1}')
             ax.plot(x, mu_indicator[:, i, j])
-            ax.set_title(f'第{i+1}个高斯分布期望的第{j+1}个参数随迭代次数的变化', fontproperties=font)
-    if not path.exists('images'):
-        os.makedirs('images')
+            ax.set_title(f'第{i + 1}个高斯分布期望的第{j + 1}个参数随迭代次数的变化', fontproperties=font)
+
+    dir_path = get_path('images')
+    if not path.exists(dir_path):
+        os.makedirs(dir_path)
     # plt.show()
-    fig.savefig(path.join('images', 'mu_iteration.png'))
+    fig.savefig(path.join(dir_path, 'mu_iteration.png'))
     plt.close()
 
     return fig

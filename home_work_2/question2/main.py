@@ -7,8 +7,8 @@ import numpy as np
 from matplotlib import pyplot as plt
 from scipy.io import loadmat
 
-from home_work_2.question2.knn_classifier import KnnClassifier
-from home_work_2.question2.likelihood_classifier import LikelihoodClassifier
+from knn_classifier import KnnClassifier
+from likelihood_classifier import LikelihoodClassifier
 
 
 # 归一化分母
@@ -27,7 +27,7 @@ def compute_max_k_accuracy(max_k, X_train, y_train, X_test, y_test, load_accurac
     :param load_accuracy_from_file: 是否读取本地文件的准确率(用以减少重复运算时间)
     """
     accuracy = np.zeros(max_k)
-    file = path.join('data', f'knn_{max_k}_accuracy.npy')
+    file = path.join(get_path('data'), f'knn_{max_k}_accuracy.npy')
     if load_accuracy_from_file and path.exists(file):
         accuracy = np.load(file)
     else:
@@ -85,9 +85,18 @@ def calculate_mu(X):
     # return np.mean(X, axis=0)
 
 
+def get_path(file):
+    """
+    获取文件路径 用于兼容不同目录下执行此python文件可能导致路径读取错误的问题
+    :param file:
+    :return:
+    """
+    return path.join(path.dirname(path.abspath(__file__)), file)
+
+
 if __name__ == '__main__':
     # 加载数据
-    data = loadmat('HW#2.mat')
+    data = loadmat(get_path('HW#2.mat'))
     c1 = data['c1']
     c2 = data['c2']
     c3 = data['c3']
@@ -129,8 +138,8 @@ if __name__ == '__main__':
     # 绘制决策边界
     knn_classifier = KnnClassifier(X_train, y_train, best_k)
 
-    likelihood_classifier.plot(X_test, y_test, 'likelihood_classifier.png')
+    likelihood_classifier.plot(X_test, y_test, get_path('likelihood_classifier.png'))
     # 注意这里绘制knn分类器的决策边界，速度很慢，在上述compute_max_k_accuracy函数中可以看出，对于一组1500数据点的训练集，耗时为约为4.7s。
     # 绘制分类边界时，需要对每个点进行预测，此时使用的点阵为 1000 * 1000 = 1000000个点，因此预测耗时为
     # 1000000 / 1500 * 4.7 = 3133s = 52.2min = 0.87h, 此时可以考虑降低绘图边界。或者使用更优算法（如kd树）以优化计算训练集的时间。
-    knn_classifier.plot(X_test, y_test, 'knn_decision_boundary.png')
+    knn_classifier.plot(X_test, y_test, get_path('knn_decision_boundary.png'))
