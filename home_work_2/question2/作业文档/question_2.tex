@@ -1,0 +1,121 @@
+%! Author = chouheiwa
+%! Date = 2022/11/05
+
+% Preamble
+\documentclass[UTF8]{article} %article 文档
+\usepackage{ctex}  %使用宏包(为了能够显示汉字)
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{geometry}
+\geometry{a4paper,scale=0.8}
+\usepackage{listings}
+\usepackage{color}
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+\lstset{frame=tb,
+    language=Python,
+    aboveskip=3mm,
+    belowskip=3mm,
+    showstringspaces=false,
+    columns=flexible,
+    basicstyle={\small\ttfamily},
+    numbers=left,%设置行号位置none不显示行号
+%numberstyle=\tiny\courier, %设置行号大小
+    numberstyle=\tiny\color{gray},
+    keywordstyle=\color{blue},
+    commentstyle=\color{dkgreen},
+    stringstyle=\color{mauve},
+    breaklines=true,
+    breakatwhitespace=true,
+    escapeinside=``,%逃逸字符(1左面的键)，用于显示中文例如在代码中`中文...`
+    tabsize=4,
+    extendedchars=false %解决代码跨页时，章节标题，页眉等汉字不显示的问题
+}
+
+% Packages
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{wasysym}
+
+% Document
+\title{机器学习课程作业-问题2}
+\author{chouheiwa}
+\date{2022/11/05}
+\linespread{1.5}
+\begin{document}
+    \maketitle
+    \tableofcontents
+    因绘图与矩阵计算，因此引入了numpy和matplotlib两个包，同时由于需要解析mat文件，因此引入了scipy包。
+
+
+    \section{第一问}
+    最近邻算法其实并没有训练过程，总体思路是获取训练集中的每一个样本，然后计算测试样本与训练样本的距离，最后选择距离最近的k个训练样本中的众数作为测试样本预测结果。
+
+    knn算法实现文件为~\href{run:knn_classifier.py}{knn\_classifier.py}。
+
+    使用scipy.io.loadmat函数加载mat文件，然后将数据集，并将数据集展开做标注，随后尝试使用$k \in 1 , 2,\dots, 100$，并将测试集数据代入knn算法中，最后绘制出$k$与准确率的关系图，如下:
+
+    \begin{figure}[htbp]
+        \centering
+        \includegraphics[width=0.8\textwidth]{../knn_accuracy}
+        \caption{最近邻算法在预测集的准确率随k值变化图}
+    \end{figure}
+
+    可以发现当$k > 40$后，随着k的增长，其准确率下降的趋势越来越明显，因此可以判定这里无需增加$k$的取值范围了，当前准确率即可找到最优$k_{opt}$
+
+    从上述准确率中获取最大的准确率为$A = 0.976667$，其$k = 14$。
+
+    即答案$k_{opt} = 14$, 对应的错误率为 $E_{opt} = 1 - A_{opt} = 0.023333$
+
+
+    \section{第二问}
+
+    从上一问数据中同样可以获得:
+
+    当$k = 1$时，对应的$A_{k=1} = 0.966667$
+
+    当$k = 50$时， 对应的$A_{k=50} = 0.968667$
+
+    这里上面两种的正确率均比$A_{k_{opt} = 14} = 0.976667$ 有一定程度的下降。
+
+    当$k = 1$时，这里算法发生了过拟合现象，即其与训练集算法准确率达到$1$，而对于测试集，因为只受到最近的一个点的影响，所以很容易收到训练集的噪点影响，所以正确率会发生下降
+
+    当$k = 50$时，算法将会发生欠拟合，从极限角度考虑，我们取$k = 1500$时，此时不论我们使用任何点，参与运算，其与训练集的多种类别数量均为500，此时，算法将无法给出正确答案。
+
+    当$k = 14$时，此时属于最优情况，对于测试集，其准确率为最大。
+
+
+    \section{第三问}
+
+    似然率分类器的处理过程如下:
+    \begin{enumerate}
+        \item 对于每一个类别，计算其样本集中均值向量$\mu_{i}$，协方差矩阵$\Sigma_{i}$，因假设其先验概率相等，因此$P_{i} = \frac{1}{3}$
+        \item 对于测试集中的每一个样本，计算其对应的每一个分布的，并应用贝叶斯公式，计算其对应的后验概率，取最大的后验概率对应的类别作为其预测类别
+    \end{enumerate}
+
+    似然分类器的分类准确率为: $A_{likelihood} = 0.771333$
+
+    最近邻算法的分类准确率为: $A_{k_{opt}} = 0.976667$
+
+    可以看出，最近邻算法的分类准确率要远远高于似然分类器，因此最近邻算法的分类效果要好于似然分类器。
+
+    对应分类界面为:
+
+    \begin{figure}[htbp]
+        \begin{minipage}[t]{0.5\linewidth}
+            \centering
+            \includegraphics[width=\linewidth]{../likelihood_classifier}
+            \caption{似然分类器分类界面}
+        \end{minipage}%
+        \begin{minipage}[t]{0.5\linewidth}
+            \centering
+            \includegraphics[width=\linewidth]{../knn_decision_boundary}
+            \caption{最近邻算法分类界面}
+        \end{minipage}
+    \end{figure}
+
+    可以看出，最近邻算法的分类界面更适配于数据集，而似然分类器的分类界面则不太适配。
+
+\end{document}

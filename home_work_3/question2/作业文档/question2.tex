@@ -1,0 +1,290 @@
+%! Author = chouheiwa
+%! Date = 2022/11/18
+
+% Preamble
+\documentclass[UTF8]{article} %article 文档
+\usepackage{ctex}  %使用宏包(为了能够显示汉字)
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{geometry}
+\geometry{a4paper,scale=0.8}
+\usepackage{listings}
+\usepackage{color}
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+\lstset{frame=tb,
+    language=Python,
+    aboveskip=3mm,
+    belowskip=3mm,
+    showstringspaces=false,
+    columns=flexible,
+    basicstyle={\small\ttfamily},
+    numbers=left,%设置行号位置none不显示行号
+%numberstyle=\tiny\courier, %设置行号大小
+    numberstyle=\tiny\color{gray},
+    keywordstyle=\color{blue},
+    commentstyle=\color{dkgreen},
+    stringstyle=\color{mauve},
+    breaklines=true,
+    breakatwhitespace=true,
+    escapeinside=``,%逃逸字符(1左面的键)，用于显示中文例如在代码中`中文...`
+    tabsize=4,
+    extendedchars=false %解决代码跨页时，章节标题，页眉等汉字不显示的问题
+}
+
+% Packages
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{wasysym}
+\usepackage{float}
+\usepackage{mathtools}
+
+% Document
+\title{机器学习课程作业-问题1}
+\author{chouheiwa}
+\date{\today}
+\linespread{1.5}
+\begin{document}
+    \maketitle
+    \tableofcontents
+    因绘图与矩阵计算，因此需要引入numpy和matplotlib两个包
+
+
+    \section{第一问}
+    生成数据散点图步骤如下:
+    \begin{enumerate}
+        \item 使用numpy的normal生成符合高斯分布$\mu = 0$, $\sigma = 0.04$的10个噪点数据$\epsilon$
+        \item 令$x_i = -5 + i\text{,} i = 0, 1, 2 \dots 9$，接下来代入函数$y_i = -\sin{x_i / 5} + \cos{x_i} + \epsilon_i$
+        \item 使用matplotlib将$(x_i, y_i)$标注即可。
+    \end{enumerate}
+
+    接下来只需继续绘制出$y = -\sin{x / 5} + \cos{x}$的图像便可实现。
+
+    生成散点数据部分代码在~\href{run:generate_data.py}{generate\_data.py}。绘制图像部分的代码在~\href{run:generate_data.py}{generate\_data.py}
+
+    最终生成图像如下:
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.4\textwidth]{../images/data}
+        \caption{生成的数据散点图}
+        \label{fig:data}
+    \end{figure}
+
+
+    \section{第二问}
+    线性回归中，累计误差公式(使用矩阵集向量的方式表达)为:
+    \begin{equation}
+        E = (Y - \hat{Y})^T(Y - \hat{Y})
+        \label{eq:E}
+    \end{equation}
+
+    其中$Y$为真实值，$\hat{Y}$为预测值。这里将$Y$和$\hat{Y}$都看作是$m$维列向量，其中$m$为数据的个数。
+
+    \begin{equation}
+        Y = \begin{bmatrix}
+                y_1    \\
+                y_2    \\
+                \vdots \\
+                y_m
+        \end{bmatrix} \text{,}
+        \hat{Y} = \begin{bmatrix}
+                      \hat{y}_1 \\
+                      \hat{y}_2 \\
+                      \vdots    \\
+                      \hat{y}_m
+        \end{bmatrix}\label{eq:Y}
+    \end{equation}
+
+    其中$\hat{Y} = X W$
+
+    \begin{equation}
+        X = \begin{bmatrix}
+                1      & x_1^{(1)} & x_1^{(2)} & \dots & x_1^{(n)} \\
+                1      & x_2^{(1)} & x_2^{(2)} & \dots & x_2^{(n)} \\
+                \vdots & \vdots    & \vdots    & \dots & \vdots    \\
+                1      & x_m^{(1)} & x_m^{(2)} & \dots & x_m^{(n)}
+        \end{bmatrix} \text{,}
+        W = \begin{bmatrix}
+                w_0    \\
+                w_1    \\
+                \vdots \\
+                w_n
+        \end{bmatrix}
+        \label{eq:X_W}
+    \end{equation}
+
+    则其最终的损失函数为:
+    \begin{equation}
+        E = (Y - XW)^T(Y - XW)
+        \label{eq:E_XW}
+    \end{equation}
+
+    \subsection{最小二乘法}
+    最小二乘法的目标是求解使得损失函数~$J(W)$最小的参数~$W$，这里使用矩阵求导:
+
+    \begin{equation}
+        \frac{\partial J(W)}{\partial W} = 2 X^T (X W - Y) \label{eq:w_0}
+    \end{equation}
+
+    令~\eqref{eq:w_0}为0，即可求解出最优的参数~$W$:
+    \begin{equation}
+        X^T X W = X^T Y \Rightarrow W = (X^T X)^{-1} X^T Y \label{eq:w_1}
+    \end{equation}
+
+    其实现函数在~\href{run:main.py}{main.py}的least\_squares中。
+
+    \subsection{梯度下降法}
+    梯度下降法的目标与最小二乘法相同，不过其采用的是迭代的方式求解最优参数~$W$。其迭代公式为:
+    \begin{equation}
+        W \coloneqq W - \frac{1}{2} \alpha \frac{\partial J(W)}{\partial W} \label{eq:w_2}
+    \end{equation}
+
+    其中$\alpha$为学习率。这里可以将最小二乘法中求出的矩阵求导公式~\eqref{eq:w_0}代入到梯度下降法的迭代公式~\eqref{eq:w_0}中，可得:
+    \begin{equation}
+        W \coloneqq W - \alpha X^T (X W - Y) \label{eq:w_3}
+    \end{equation}
+
+    其实现函数在~\href{run:main.py}{main.py}的gradient\_descent中。
+
+
+    \section{第三问}
+    这里最小二乘法和梯度下降法最终求得的最小损失函数的参数值是相同的，对于样本数小的数据集下，两者的参数计算速度差不多，但对于样本数大的数据集下，梯度下降法的计算速度要快于最小二乘法（矩阵计算消耗非常大）。
+
+    对于本题而言，因第一问中的操作生成样本数据集每次都不一样，所以选择将首次生成的数据存入文件，接下来的每一次都从文件中读取数据，这样可以保证每次的数据集都是一样的，这样可以保证每次的计算结果都是一样的。
+
+    因题目中仅有10个样本，所以此时把10个样本全部展示:
+
+    \input{data.tex}
+
+    对应的参数计算结果为:
+    \input{param.tex}
+
+    \begin{figure}[H]
+        \begin{minipage}[b]{0.5\linewidth}
+            \centering
+            \includegraphics[width=\textwidth]{../images/gd_history}
+            \caption{梯度下降的损失函数下降随迭代次数的变化曲线}
+            \label{fig:gd_history}
+        \end{minipage}
+        \begin{minipage}[b]{0.5\linewidth}
+            \centering
+            \includegraphics[width=\textwidth]{../images/predict_line_poly_1}
+            \caption{预测结果直线}
+            \label{fig:pd_line}
+        \end{minipage}
+    \end{figure}
+
+
+    \section{第四问}
+    这里由于线性回归采用的是直线预测，且题目中可以看出，均方误差对于两种算法都是相同的。即对于线性回归而言，两种算法的结果是一样的。区别在于，最小二乘法是直接求解出最优参数，而梯度下降法是通过迭代的方式求解最优参数。不论通过何种方式求解，其原理均是采用对损失函数求导，通过导数进行最终计算。
+
+
+    \section{第五问}
+    对于多项式回归，其预测的是多项式函数，因此可以对样本矩阵稍作改动，将样本矩阵改成如下形式:
+    \begin{equation}
+        X = \begin{bmatrix}
+                1      & x_1    & x_1^2  & \cdots & x_1^n  \\
+                1      & x_2    & x_2^2  & \cdots & x_2^n  \\
+                \vdots & \vdots & \vdots & \ddots & \vdots \\
+                1      & x_m    & x_m^2  & \cdots & x_m^n
+        \end{bmatrix}
+        \label{eq:poly_x}
+    \end{equation}
+    其中，$n$为多项式的阶数，$m$为样本数。我们通过最小二乘法求解出最优参数，从而得到当前阶数下的最优的多项式函数。并通过逐渐增加多项式的阶数，来观察其预测结果的变化。从而可以获得更佳的预测函数。这里我们将多项式的阶数从1到12进行测试，得到的结果如下:
+
+    \begin{figure}[H]
+        \begin{minipage}[b]{0.24\linewidth}
+            \centering
+            \includegraphics[width=\textwidth]{../images/predict_line_poly_1}
+            \caption{函数最高阶数$1$}
+            \label{fig:poly_1}
+        \end{minipage}
+        \begin{minipage}[b]{0.24\linewidth}
+            \centering
+            \includegraphics[width=\textwidth]{../images/predict_line_poly_2}
+            \caption{函数最高阶数$2$}
+            \label{fig:poly_2}
+        \end{minipage}
+        \begin{minipage}[b]{0.24\linewidth}
+            \centering
+            \includegraphics[width=\textwidth]{../images/predict_line_poly_3}
+            \caption{函数最高阶数$3$}
+            \label{fig:poly_3}
+        \end{minipage}
+        \begin{minipage}[b]{0.24\linewidth}
+            \centering
+            \includegraphics[width=\textwidth]{../images/predict_line_poly_4}
+            \caption{函数最高阶数$4$}
+            \label{fig:poly_4}
+        \end{minipage}
+    \end{figure}
+
+    \begin{figure}[H]
+        \begin{minipage}[b]{0.24\linewidth}
+            \centering
+            \includegraphics[width=\textwidth]{../images/predict_line_poly_5}
+            \caption{函数最高阶数$5$}
+            \label{fig:poly_5}
+        \end{minipage}
+        \begin{minipage}[b]{0.24\linewidth}
+            \centering
+            \includegraphics[width=\textwidth]{../images/predict_line_poly_6}
+            \caption{函数最高阶数$6$}
+            \label{fig:poly_6}
+        \end{minipage}
+        \begin{minipage}[b]{0.24\linewidth}
+            \centering
+            \includegraphics[width=\textwidth]{../images/predict_line_poly_7}
+            \caption{函数最高阶数$7$}
+            \label{fig:poly_7}
+        \end{minipage}
+        \begin{minipage}[b]{0.24\linewidth}
+            \centering
+            \includegraphics[width=\textwidth]{../images/predict_line_poly_8}
+            \caption{函数最高阶数$8$}
+            \label{fig:poly_8}
+        \end{minipage}
+    \end{figure}
+
+    \begin{figure}[H]
+        \begin{minipage}[b]{0.24\linewidth}
+            \centering
+            \includegraphics[width=\textwidth]{../images/predict_line_poly_9}
+            \caption{函数最高阶数$9$}
+            \label{fig:poly_9}
+        \end{minipage}
+        \begin{minipage}[b]{0.24\linewidth}
+            \centering
+            \includegraphics[width=\textwidth]{../images/predict_line_poly_10}
+            \caption{函数最高阶数$10$}
+            \label{fig:poly_10}
+        \end{minipage}
+        \begin{minipage}[b]{0.24\linewidth}
+            \centering
+            \includegraphics[width=\textwidth]{../images/predict_line_poly_11}
+            \caption{函数最高阶数$11$}
+            \label{fig:poly_11}
+        \end{minipage}
+        \begin{minipage}[b]{0.24\linewidth}
+            \centering
+            \includegraphics[width=\textwidth]{../images/predict_line_poly_12}
+            \caption{函数最高阶数$12$}
+            \label{fig:poly_12}
+        \end{minipage}
+    \end{figure}
+
+    从上图可以看出，随着多项式的阶数的增加，拟合的曲线越来越接近真实的曲线，即预测的结果越来越准确。但是，当多项式的阶数过高时，拟合的曲线会出现过拟合的现象，即拟合的曲线会过于贴近训练数据，从而会受到更多的噪声影响，进而导致预测的结果不准确。
+
+    这里对于多项式的阶数的选择，因为我们已知了目标函数，便可以将目标区域$[-5, 5]$等分切成100个点，并将这100个点作为函数的测试集引入，计算出其均方误差，取均方误差中最小的那个阶数即可获得最优多项式。
+
+    当阶数高于10阶时，会发现拟合函数出现了严重的偏差，这里个人对于该项原因的理解为: 过高的阶数导致了数据运算精度超出了浮点数的精度，从而导致了拟合函数出现了严重的偏差。
+
+    通过代码计算出的最优多项式的阶数为$6$，其拟合函数为:
+    \input{poly.tex}
+
+    上述部分的执行代码均在~\href{run:main.py}{main.py}的执行程序部分。
+
+\end{document}
