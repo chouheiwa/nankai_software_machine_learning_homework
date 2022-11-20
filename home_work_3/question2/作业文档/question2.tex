@@ -193,7 +193,7 @@
         \end{bmatrix}
         \label{eq:poly_x}
     \end{equation}
-    其中，$n$为多项式的阶数，$m$为样本数。我们通过最小二乘法求解出最优参数，从而得到当前阶数下的最优的多项式函数。并通过逐渐增加多项式的阶数，来观察其预测结果的变化。从而可以获得更佳的预测函数。这里我们将多项式的阶数从1到12进行测试，得到的结果如下:
+    其中，$n$为多项式的阶数，$m$为样本数。我们通过最小二乘法求解出最优参数，从而得到当前阶数下的最优的多项式函数。并通过逐渐增加多项式的阶数，来观察其预测结果的变化。从而可以获得更佳的预测函数。这里我们将多项式的阶数从1到$n-1 = 10 - 1 = 9$ 进行测试，得到的绘图结果如下:
 
     \begin{figure}[H]
         \begin{minipage}[b]{0.24\linewidth}
@@ -256,33 +256,13 @@
             \caption{函数最高阶数$9$}
             \label{fig:poly_9}
         \end{minipage}
-        \begin{minipage}[b]{0.24\linewidth}
-            \centering
-            \includegraphics[width=\textwidth]{../images/predict_line_poly_10}
-            \caption{函数最高阶数$10$}
-            \label{fig:poly_10}
-        \end{minipage}
-        \begin{minipage}[b]{0.24\linewidth}
-            \centering
-            \includegraphics[width=\textwidth]{../images/predict_line_poly_11}
-            \caption{函数最高阶数$11$}
-            \label{fig:poly_11}
-        \end{minipage}
-        \begin{minipage}[b]{0.24\linewidth}
-            \centering
-            \includegraphics[width=\textwidth]{../images/predict_line_poly_12}
-            \caption{函数最高阶数$12$}
-            \label{fig:poly_12}
-        \end{minipage}
     \end{figure}
 
-    从上图可以看出，随着多项式的阶数的增加，拟合的曲线越来越接近真实的曲线，即预测的结果越来越准确。但是，当多项式的阶数过高时，拟合的曲线会出现过拟合的现象，即拟合的曲线会过于贴近训练数据，从而会受到更多的噪声影响，进而导致预测的结果不准确。
+    从上图可以看出，随着多项式的阶数的增加，拟合的曲线越来越贴近数据点，即对于训练集的误差会越来越小。但是，当多项式的阶数过高时，拟合的曲线会出现过拟合的现象，即拟合的曲线会过于贴近训练数据，从而会受到更多的噪声影响，进而导致预测的结果不准确（泛化效果差）。
 
     这里对于多项式的阶数的选择，因为我们已知了目标函数，便可以将目标区域$[-5, 5]$等分切成100个点，并将这100个点作为函数的测试集引入，计算出其均方误差，取均方误差中最小的那个阶数即可获得最优多项式。
 
-    当阶数高于10阶时，会发现拟合函数出现了严重的偏差，这里个人对于该项原因的理解为: 过高的阶数导致了数据运算精度超出了浮点数的精度，从而导致了拟合函数出现了严重的偏差。
-
-    通过代码计算出的最优多项式的阶数为$6$，其拟合函数为:
+    最终结果中，样本数据点通过代码计算出的最优多项式的阶数为$6$，其拟合函数为:
     \input{poly.tex}
 
     上述部分的执行代码均在~\href{run:main.py}{main.py}的执行程序部分。

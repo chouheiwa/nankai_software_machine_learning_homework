@@ -53,6 +53,18 @@ def compute_E(X, Y, W):
     return np.matmul(temp.T, temp) / 2
 
 
+def compute_root_mean_square_error(X, Y, W):
+    """
+    计算均方根误差
+    :param X: 输入数据集
+    :param Y: 输出数据集
+    :param W: 系数
+    :return: 返回均方根误差
+    """
+    temp = np.matmul(X, W) - Y
+    return np.sqrt(np.matmul(temp.T, temp) / X.shape[0])
+
+
 if __name__ == '__main__':
     # 问题一
     # 生成数据集
@@ -107,7 +119,7 @@ if __name__ == '__main__':
     min_real_error = 1000000
     min_poly_index = 0
     min_poly_W_L = None
-    for i in range(2, 13):
+    for i in range(2, gd.size - 1):
         # 添加幂数据
         data_array.append(gd.target_x ** i)
         real_data_array.append(domain_x ** i)
@@ -120,17 +132,17 @@ if __name__ == '__main__':
         # 绘制拟合曲线
         plot_image.plot_predict_line(W_L, gd.target_x, gd.target_y, gd.function_x)
         # 计算均方误差
-        error = compute_E(X, Y, W_L)
+        error = compute_root_mean_square_error(X, Y, W_L)
         # 计算真实函数的均方误差
-        real_error = compute_E(domain_X, domain_Y, W_L)
-        print('%d次项 均方误差为: %.4f, 真实函数均方误差为: %.4f' % (i, error, real_error))
+        real_error = compute_root_mean_square_error(domain_X, domain_Y, W_L)
+        print('%d次项 均方根误差为: %.4f, 真实函数均方根误差为: %.4f' % (i, error, real_error))
         # 记录最小的真实函数均方误差
         if real_error < min_real_error:
             min_real_error = real_error
             min_poly_index = i
             min_poly_W_L = W_L
 
-    print('最小的真实函数均方误差为: %.4f, 对应的多项式为: %d次项' % (min_real_error, min_poly_index))
+    print('最小的真实函数均均方根误差为: %.4f, 对应的多项式为: %d次项' % (min_real_error, min_poly_index))
 
     try:
         # 这里是用于生成最终pdf的代码，在正式运行流程中无影响

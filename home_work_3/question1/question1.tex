@@ -139,7 +139,7 @@
             \mathrm{Var}(\TildeBeta) = \mathrm{Var}(\HatBeta) + \sigma^{2} D D^T
         \end{align}
 
-        因为 $D D^T$ 为正定矩阵，所以 $\mathrm{Var}(\TildeBeta) \geq \mathrm{Var}(\HatBeta)$。即对于其他的任意线性估计器，其偏差均不小于最小二乘法的方差。由此可证，最小二乘法是最优的。
+        因为 $D D^T$ 为正定矩阵，所以 $\mathrm{Var}(\TildeBeta) \geq \mathrm{Var}(\HatBeta)$。即对于其他的任意线性估计器，其偏差均不小于最小二乘法的偏差。由此可证，最小二乘法是最优的，证毕。
     \end{proof}
 
     注: 本题等价于证明 高斯-马尔可夫定理~\cite{wiki}，即任意线性估计器的方差均不小于最小二乘法的方差。
