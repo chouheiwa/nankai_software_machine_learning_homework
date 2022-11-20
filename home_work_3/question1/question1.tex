@@ -1,0 +1,148 @@
+%! Author = chouheiwa
+%! Date = 2022/11/18
+
+% Preamble
+\documentclass[UTF8]{article} %article 文档
+\usepackage{ctex}  %使用宏包(为了能够显示汉字)
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{geometry}
+\geometry{a4paper,scale=0.8}
+\usepackage{listings}
+\usepackage{color}
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+\lstset{frame=tb,
+    language=Python,
+    aboveskip=3mm,
+    belowskip=3mm,
+    showstringspaces=false,
+    columns=flexible,
+    basicstyle={\small\ttfamily},
+    numbers=left,%设置行号位置none不显示行号
+%numberstyle=\tiny\courier, %设置行号大小
+    numberstyle=\tiny\color{gray},
+    keywordstyle=\color{blue},
+    commentstyle=\color{dkgreen},
+    stringstyle=\color{mauve},
+    breaklines=true,
+    breakatwhitespace=true,
+    escapeinside=``,%逃逸字符(1左面的键)，用于显示中文例如在代码中`中文...`
+    tabsize=4,
+    extendedchars=false %解决代码跨页时，章节标题，页眉等汉字不显示的问题
+}
+
+% Packages
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{wasysym}
+\usepackage{float}
+\usepackage{mathtools}
+
+% new command
+\newcommand{\BoldEpsilon}{\boldsymbol{\varepsilon}}
+\newcommand{\BoldBeta}{\boldsymbol{\beta}}
+\newcommand{\TildeBeta}{\tilde{\boldsymbol{\beta}}}
+\newcommand{\HatBeta}{\hat{\boldsymbol{\beta}}}
+\newcommand{\BaseX}{(\mathbf{X}^T \mathbf{X})^{-1}\mathbf{X}^T}
+\newcommand{\CExpand}{\BaseX + \mathbf{D}}
+
+% Document
+\title{机器学习课程作业——问题1}
+\author{chouheiwa}
+\date{\today}
+\linespread{1.5}
+\begin{document}
+    \maketitle
+
+    \begin{proof}
+        对于多元线性回归模型:
+        \begin{equation}
+            y_i = \sum_{j=1}^p \beta_j x_{ij} + \varepsilon_i \text{,} x_{i0} = 1 \text{,} i = 1,2,\cdots,n \label{eq:eq_y_i}
+        \end{equation}
+
+        使用矩阵可表示如下:
+        \begin{equation}
+            \mathbf{Y} = \mathbf{X} \mathbf{\beta} + \BoldEpsilon \label{eq:eq_y}
+        \end{equation}
+        其中:
+
+        \begin{align}
+            \mathbf{Y} &= \begin{bmatrix}
+                              y_1    \\
+                              y_2    \\
+                              \vdots \\
+                              y_n
+            \end{bmatrix} \text{（观测值向量）} \\
+            \mathbf{X} &= \begin{bmatrix}
+                              1      & x_{11} & \cdots & x_{1p} \\
+                              1      & x_{21} & \cdots & x_{2p} \\
+                              \vdots & \vdots & \ddots & \vdots \\
+                              1      & x_{n1} & \cdots & x_{np}
+            \end{bmatrix} \text{（设计矩阵）} \\
+            \mathbf{\beta} &= \begin{bmatrix}
+                                  \beta_0 \\
+                                  \beta_1 \\
+                                  \vdots  \\
+                                  \beta_p
+            \end{bmatrix} \text{（参数向量）} \\
+            \BoldEpsilon &= \begin{bmatrix}
+                                \varepsilon_1 \\
+                                \varepsilon_2 \\
+                                \vdots        \\
+                                \varepsilon_n
+            \end{bmatrix} \text{（随机误差向量）}
+        \end{align}
+
+        题目可以等价于求证:
+
+        当满足如下条件时:
+        \begin{itemize}
+            \item 对于任意的$\mathbf{X}$, $E(\BoldEpsilon | \mathbf{X}) = 0$ (零均值)
+            \item $\mathbf{Var(\BoldEpsilon | \mathbf{X})} = E(\BoldEpsilon \BoldEpsilon^T | \mathbf{X}) = \sigma_{\mathbf{\varepsilon}}^2 I_{n}$ (方差相等且不相关)
+        \end{itemize}
+        最小二乘法获得的参数估计是最优的。
+
+        令 $\TildeBeta = \mathbf{C} \mathbf{Y}$ 作为另一种线性估计器，其中 $\mathbf{C} = (\mathbf{X}^T \mathbf{X})^{-1}\mathbf{X}^T + \mathbf{D}$, $D$为非零矩阵。则有:
+
+        \begin{align}
+            E(\TildeBeta) &= E(\mathbf{C} \mathbf{Y}) \notag \\
+            &= E\left[\left( \CExpand \right)(\mathbf{X} \BoldBeta+\BoldEpsilon)\right] \notag \\
+            &= \left( \CExpand \right) \mathbf{X} \BoldBeta+\left( \CExpand \right) \mathrm{E}[\BoldEpsilon]
+        \end{align}
+
+        因 $\mathrm{E}[\BoldEpsilon] = 0$,则有:
+        \begin{align}
+            E(\TildeBeta) &= \left( \CExpand \right) \mathbf{X} \BoldBeta \notag \\
+            &= \left(\left(\mathbf{X}^T \mathbf{X}\right)^{-1} \mathbf{X}^T \mathbf{X} + D\mathbf{X}\right) \BoldBeta \notag \\
+            &= (\mathbf{I} + D \mathbf{X}) \BoldBeta
+        \end{align}
+        由于 $\BoldBeta$ 是不可知的，即 当且仅当 $D \mathbf{X} = 0$时，$\TildeBeta$ 是无偏差的。此时，偏差函数如下：
+        \begin{align}
+            \mathrm{Var}(\TildeBeta) &= \mathrm{Var}(\mathbf{C} \mathbf{Y}) \notag \\
+            &= \mathbf{C} \mathrm{Var}(\mathbf{Y}) \mathbf{C}^T \notag \\
+            &= \sigma^{2} \mathbf{C} \mathbf{C}^T \notag \\
+            &= \sigma^{2} \left( \CExpand \right) \left( \mathbf{X} (\mathbf{X}^T \mathbf{X})^{-1} + D^T \right) \notag \\
+            &= \sigma^{2}\left(\left(\mathbf{X}^T \mathbf{X}\right)^{-1} \mathbf{X}^T \mathbf{X}\left(\mathbf{X}^T \mathbf{X}\right)^{-1}+\left(\mathbf{X}^T \mathbf{X}\right)^{-1} \mathbf{X}^T D^{\prime}+D \mathbf{X}\left(\mathbf{X}^T \mathbf{X}\right)^{-1}+D D^T\right) \notag \\
+            &= \sigma^{2}\left(\mathbf{X}^T \mathbf{X}\right)^{-1}+\sigma^{2}\left(\mathbf{X}^T \mathbf{X}\right)^{-1}(D \mathbf{X})^T+\sigma^{2} D \mathbf{X}\left(\mathbf{X}^T \mathbf{X}\right)^{-1}+\sigma^{2} D D^T
+        \end{align}
+
+        由于 $D \mathbf{X} = 0$:
+        \begin{align}
+            \mathrm{Var}(\TildeBeta) =  \sigma^{2}\left(\mathbf{X}^T \mathbf{X}\right)^{-1} + \sigma^{2} D D^T
+        \end{align}
+
+        又有 $\sigma^{2} (\mathbf{X}^T \mathbf{X}) = \mathrm{Var}(\HatBeta)$，$\HatBeta$为最小二乘法的估计参数。由此可得：
+        \begin{align}
+            \mathrm{Var}(\TildeBeta) = \mathrm{Var}(\HatBeta) + \sigma^{2} D D^T
+        \end{align}
+
+        因为 $D D^T$ 为正定矩阵，所以 $\mathrm{Var}(\TildeBeta) \geq \mathrm{Var}(\HatBeta)$。即对于其他的任意线性估计器，其偏差均不小于最小二乘法的方差。由此可证，最小二乘法是最优的。
+    \end{proof}
+
+    注: 本题等价于证明 高斯-马尔可夫定理~\cite{wiki}，即任意线性估计器的方差均不小于最小二乘法的方差。
+    \bibliography{question1}
+    \bibliographystyle{plain}
+\end{document}
